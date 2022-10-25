@@ -7,11 +7,22 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
-
-    runs-on: windows-latest
-
+  setupjob:
+    name: Setup MinGW
+    continue-on-error: FALSE
     steps:
-    - uses: actions/checkout@v3
-    - name: make Makefile SCIP
-      run: make Makefile SCIP
+      uses: egor-tensin/setup-mingw@v2
+    with:
+      platform: x64
+  
+  buildjob:
+    name: Build SCIP
+    needs: setupjob
+    runs-on: windows-latest
+    continue-on-error: FALSE
+    steps:
+      uses: actions/checkout@v3
+      name: make SCIP
+      run: make SCIP
+    with:
+      platform: x64
