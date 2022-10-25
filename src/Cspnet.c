@@ -272,7 +272,7 @@ void   load_network(double *status,char type)
                        macsz, marsz, matsz, 0, 0, 0, 0, 0);
 
         if ( Nlp == NULL ){                
-                std::cout << "ERROR: There is not enought memory for the first LP" << std::endl;
+                std::cout << "ERROR: There is not enough memory for the first LP" << std::endl;
                 CSPexit(EXIT_LPSOLVER); //exit(1);
         }
 #ifdef STAMP    
@@ -288,7 +288,7 @@ void   load_network(double *status,char type)
 
 
 #ifdef CHECKLP
-        JJmpswrite(Nlp,"sdcnet.mps");
+        JJmpswrite(Nlp,fmpsnet);
 #endif
 }
 
@@ -464,8 +464,8 @@ double    protection_level(VARIABLE *var,int goal,int *nvar,VARIABLE **lvar,doub
     else
         JJchgcoef(Nlp,-1,num,1.0);
 
-	if( type == 'I' ){
-		JJlpwrite(Nlp,netlpname);
+    if( type == 'I' ){
+	JJlpwrite(Nlp,netlpname);
         if ( JJmipopt(Nlp) ){            
             std::cout << " it was not possible to solve with mip-opt " << std::endl;
             JJlpwrite(Nlp,netlpname);
@@ -475,7 +475,7 @@ double    protection_level(VARIABLE *var,int goal,int *nvar,VARIABLE **lvar,doub
 	    JJgetobjval(Nlp,&opt);
         JJchgcoef(Nlp,-1,num,0.0);
 		return opt;
-	}
+    }
 
     if ( JJnetopt(Nlp,&netstatus,&netnodes,&netarcs,&netiter) ){        
         std::cout << " it was not possible to solve with NETOPT " << std::endl;

@@ -71,7 +71,7 @@ void       separa(int        *card,CONSTRAINT **stack)
     if( *card ) return;
 
 
-    write_sol("partial.sol");
+    write_sol(fpartial);
     range = 0.0;
     for(k=0;k<nsupport;k++){
         var = support[k];
@@ -172,7 +172,7 @@ static long int   hash(CONSTRAINT *con)
 
 {
     int k;
-    long int val;
+    long int val=0;
     double   rhs;
 
     rhs = con->rhs;
@@ -265,7 +265,16 @@ static     int iden_rows(CONSTRAINT * con1 ,CONSTRAINT * con2 )
     int      card1,card2,identical;
     double   *coef1,*coef2;
     VARIABLE **stack1,**stack2;
-
+    
+    // PWOF added initialisation
+    stack1=NULL;
+    stack2=NULL;
+    coef1=NULL;
+    coef2=NULL;
+    card1=0;
+    card2=0;
+    //
+    
     if( con1->hash != con2->hash ) return(0);
 
 ////////#ifndef STAMP

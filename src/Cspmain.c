@@ -12,7 +12,7 @@
 /*                                                  */
 /* Last modified September 10, 2001                 */
 /****************************************************/
-
+//#define STAMP
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -160,27 +160,39 @@ int     CSPrelbounds(int nlist,int *list,double *ub,double *lb,char type){ retur
 
 void PPCSPSetFileNames(const char* dir)
 {
-        fsolution = (char*) malloc((strlen(dir) + 15)*sizeof(char));
-	fheuristi = (char*) malloc((strlen(dir) + 15)*sizeof(char));
-	fout = (char*) malloc((strlen(dir) + 15)*sizeof(char));
-	fbranch = (char*) malloc((strlen(dir) + 15)*sizeof(char));
-        fproblemlp = (char*) malloc((strlen(dir) + 15)*sizeof(char));
-        fsdcnetlp = (char*) malloc((strlen(dir) + 15)*sizeof(char));
-        fCSPlog = (char*) malloc((strlen(dir) + 15)*sizeof(char));
-	strcpy(fsolution,dir);
-	strcat(fsolution,"cspSCIP.sol");
-	strcpy(fheuristi,dir);
-	strcat(fheuristi,"cspSCIP.heu");
-	strcpy(fout,dir);
-	strcat(fout,"cspSCIP.sta");
-	strcpy(fbranch,dir);
-	strcat(fbranch,"cspSCIP.bra");
-        strcpy(fproblemlp,dir);
-	strcat(fproblemlp,"problem.lp");
-        strcpy(fsdcnetlp,dir);
-	strcat(fsdcnetlp,"sdcnet.lp");
-        strcpy(fCSPlog,dir);
-        strcat(fCSPlog,"CSPlogfile.txt");
+        int maxfilenamesize = strlen(dir) + 15;
+        int dirnamesize = strlen(dir)+1;
+        
+        fsolution = (char*) malloc(maxfilenamesize*sizeof(char));
+	fheuristi = (char*) malloc(maxfilenamesize*sizeof(char));
+	fout = (char*) malloc(maxfilenamesize*sizeof(char));
+	fbranch = (char*) malloc(maxfilenamesize*sizeof(char));
+        fproblemlp = (char*) malloc(maxfilenamesize*sizeof(char));
+        fsdcnetlp = (char*) malloc(maxfilenamesize*sizeof(char));
+        fsdclp = (char*) malloc(maxfilenamesize*sizeof(char));
+        fCSPlog = (char*) malloc(maxfilenamesize*sizeof(char));
+        fpartial = (char*) malloc(maxfilenamesize*sizeof(char));
+        fmpsnet = (char*) malloc(maxfilenamesize*sizeof(char));
+	strncpy(fsolution,dir,dirnamesize);
+	strncat(fsolution,"cspSCIP.sol",15);
+	strncpy(fheuristi,dir,dirnamesize);
+	strncat(fheuristi,"cspSCIP.heu",15);
+	strncpy(fout,dir,dirnamesize);
+	strncat(fout,"cspSCIP.sta",15);
+	strncpy(fbranch,dir,dirnamesize);
+	strncat(fbranch,"cspSCIP.bra",15);
+        strncpy(fproblemlp,dir,dirnamesize);
+	strncat(fproblemlp,"problem.lp",15);
+        strncpy(fsdcnetlp,dir,dirnamesize);
+	strncat(fsdcnetlp,"sdcnet.lp",15);
+        strncpy(fsdclp,dir,dirnamesize);
+	strncat(fsdclp,"sdc.lp",15);
+        strncpy(fpartial,dir,dirnamesize);
+	strncat(fpartial,"partial.sol",15); 
+        strncpy(fmpsnet,dir,dirnamesize);
+	strncat(fmpsnet,"sdcnet.mps",15); 
+        strncpy(fCSPlog,dir,dirnamesize);
+        strncat(fCSPlog,"CSPlogfile.txt",15);
 }
 
 void PPCSPFreeFileNames()
@@ -197,8 +209,15 @@ void PPCSPFreeFileNames()
         fproblemlp = NULL; /*PWOF*/
         free(fsdcnetlp);
         fsdcnetlp = NULL; /*PWOF*/
+        free(fsdclp);
+        fsdclp = NULL; /*PWOF*/        
         free(fCSPlog);
         fCSPlog = NULL; /*PWOF*/
+        free(fmpsnet);
+        fmpsnet = NULL;
+        free(fpartial);
+        fpartial = NULL;
+        
 }
 
 void PPCSPSetDoubleConstant(const int ConstName, double ConstValue)
@@ -295,7 +314,8 @@ int PPCSPGetIntegerConstant(const int ConstName)
 
 int  PPCSPoptimize(IProgressListener* ProgressListener)
 {
-    int        k,lcuts,upperb_root,upperb_init,nbr,old_ub,root,lprows,rowsinit,initpl;
+    int        k,lcuts,upperb_root=0,upperb_init=0,nbr,old_ub,root,lprows,rowsinit,initpl;
+    int        res_prep;
     CONSTRAINT *stack[MAX_CUTS_ITER];
 
     float      t1,tprep,theur0,theur1,troot,tseparation,tstart;
@@ -349,7 +369,9 @@ int  PPCSPoptimize(IProgressListener* ProgressListener)
     // End Added PWOF
     /**** preprocessing ****/
 
-    k = preprocessing();
+    // k = preprocessing();
+    // k replaced by res_prep: was confusing to use k as result of preprocessing as well as counter
+    res_prep = preprocessing();
 
     tprep = seconds()-t0;
     NEWcells = Rncells;
@@ -357,7 +379,9 @@ int  PPCSPoptimize(IProgressListener* ProgressListener)
 #ifdef STAMP
         std::cout << " New number of cells=" << Rncells << "     New number of links=" << Rnsums << std::endl;
 #endif
-    if( k==0 ){
+        
+    // k replaced by res_prep: was confusing to use k as result of preprocessing as well as counter
+    if( res_prep==0 ){
         upperb_root = upperb_init = upperb = 0;
         nbetter = nsensitive;
         for(k=0;k<nbetter;k++){
@@ -371,10 +395,10 @@ int  PPCSPoptimize(IProgressListener* ProgressListener)
         ubtype = 'P';
         goto OUT;
     }
-    if( k<0 ){
+    if( res_prep<0 ){
         upperb_root = upperb_init = upperb = INF;
         nbetter = 1;
-        better[0] = prot_level[-k-1].sen->var;
+        better[0] = prot_level[-res_prep-1].sen->var;
 #ifdef STAMP
         std::cout << " Not feasible solution exists because cell " << better[0]->name << std::endl;
 #endif
@@ -431,7 +455,7 @@ int  PPCSPoptimize(IProgressListener* ProgressListener)
         {
                 ProgressListener->UpdateUB(upperb);
                 ProgressListener->UpdateLB(lowerb);
-                ProgressListener->UpdateDiscrepancy((upperb-lowerb)/lowerb);
+                ProgressListener->UpdateDiscrepancy(100*(upperb-lowerb)/lowerb); // percentages
                 ProgressListener->UpdateTime((int) (seconds()-tstart));
         }
         
@@ -572,7 +596,8 @@ OUT:
     fclose(fich);
 //#endif 
     
-    return(0);
+    //return(0);
+    return(bad_heuristic);
 }
 
 /*******************************************************************/
@@ -1043,7 +1068,7 @@ static void  init_variable_type()
 
     cant = MAX_COLS_LP / num;
     num = 0;
-    for(i=0;i<Rnsums;i++)
+    for(i=0;i<Rnsums;i++){
         if( mrow[i] ){
             cont = 0;
             for( c=listsum[ oldsumname[i] ] ; c ; c=c->next ){
@@ -1052,17 +1077,19 @@ static void  init_variable_type()
                     stack[ cont++ ] = col;
             }
             if( cont>cant ){
-                qsort( (char *)stack , cont , sizeof(VARIABLE *) , sort_cols );
+                //qsort( (char *)stack , cont , sizeof(VARIABLE *) , sort_cols );
+                qsort( (void *)stack , cont , sizeof(VARIABLE *) , sort_cols );
                 cont = cant;
             }
             for(j=0;j<cont;j++)
                 stack[j]->stat = LP_LB;
             num += cont;
         }
+    }
     free(stack);
-    stack = NULL; /*PWOF*/
+    //stack = NULL; /*PWOF*/
     free(mrow);
-    mrow = NULL; /*PWOF*/
+    //mrow = NULL; /*PWOF*/
 }
 
 int sort_cols(const void*p,const void*q/*VARIABLE **p,VARIABLE **q*/)

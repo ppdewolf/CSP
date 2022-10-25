@@ -12,7 +12,7 @@
 
 /* Definitions for SDC */
 
-#define   VERSION      "0.0.1"  /* software current version                */
+#define   VERSION      "1.0.0.4"  /* software current version                */
 
 #define   CAPACITY  1
 #define   BRIDGE    2

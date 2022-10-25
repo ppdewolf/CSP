@@ -1,11 +1,12 @@
 #include "mt1rc.h"
 
-static void   CHMT1RC(int,double *,double *,double,double *,int);
+static void   CHMT1RC(int, double *, double *, double, double *, int);
 //static void MT1RC(int,double *,double *,double,double,double *,int *,
   //     int,int,int *,double *,double *,double *,int *,double *,double *);
 /***********************************************************/
 
-void MT1RC(int N,double *P,double *W,double C,double EPS,double *Z,int    *X,int JDIM,int JCK,int    *XX,double *MIN,double *PSIGN,double *WSIGN,int    *ZSIGN,double *CRC,double *CRP)
+void MT1RC(int N, double *P, double *W, double C, double EPS, double *Z, int *X, int JDIM, int JCK,
+           int *XX, double *MIN, double *PSIGN, double *WSIGN, int *ZSIGN, double *CRC, double *CRP)
 
 {
 /***************************************************************
@@ -17,7 +18,7 @@ void MT1RC(int N,double *P,double *W,double C,double EPS,double *Z,int    *X,int
  *                W[1]*X[1]+...+W[N]*X[N] <= C,                *
  *                X[J] = 0 or 1 per J = 1,..,N.                *
  *                                                             *
- * Il programma Š una versione modificata della subroutine     *
+ * Il programma ï¿½ una versione modificata della subroutine     *
  * MT1C.                                                       *
  *                                                             *
  * I dati di ingresso del problema devono soddisfare le        *
@@ -30,12 +31,12 @@ void MT1RC(int N,double *P,double *W,double C,double EPS,double *Z,int    *X,int
  *                                                             *
  * MT1RC chiama 1 subroutine:CHMT1RC.                          *
  *                                                             *
- * La comunicazione con il programma Š solamente possibile     *
+ * La comunicazione con il programma ï¿½ solamente possibile     *
  * attraverso la lista dei parametri.                          *
- * Il programma Š stato scritto utilizzando il linguaggio di   *
+ * Il programma ï¿½ stato scritto utilizzando il linguaggio di   *
  * programmazione C,non sono state usate costanti dipendenti   *
  * dalla macchina che si intende utilizzare.                   *
- * Il programma Š stato collaudato su DIGITAL VAX_STATION 2000.*
+ * Il programma ï¿½ stato collaudato su DIGITAL VAX_STATION 2000.*
  *                                                             *
  * MT1RC ha bisogno di 10 vettori:                             *
  *   P , W , X , XX , MIN , PSIGN , WSIGN , ZSIGN , CRC, CRP   *
@@ -45,18 +46,18 @@ void MT1RC(int N,double *P,double *W,double C,double EPS,double *Z,int    *X,int
  *   N    = numero di oggetti;                                 *
  *   P[J] = profitto dell'oggetto J (J = 1,...,N);             *
  *   W[J] = peso dell'oggetto J (J = 1,...N);                  *
- *   C    = capacit…;                                          *
+ *   C    = capacitï¿½;                                          *
  *   EPS  = tolleranza(due valori positivi Q e R sono          *
  *          considerati uguali if ABS(Q-R)/MAX(Q,R) <= EPS;    *
  *   JDIM = dimensione dei 10  arrays;                         *
- *   JCK  = 1 se Š richiesto il controllo dei dati di ingresso,*
+ *   JCK  = 1 se ï¿½ richiesto il controllo dei dati di ingresso,*
  *          0 altrimenti.                                      *
  *                                                             *
  * I principali parametri di uscita sono:                      *
  *   Z =    valore della soluzione ottima se Z > 0,            *
  *          errore nei dati di ingresso (quando JCK = 1)       *
- *          se Z < 0,la condizione -Z Š stata viol…ta;         *
- *   X[J] = 1 se l'oggetto J Š nella soluzione ottima,         *
+ *          se Z < 0,la condizione -Z ï¿½ stata violï¿½ta;         *
+ *   X[J] = 1 se l'oggetto J ï¿½ nella soluzione ottima,         *
  *          0 altrimenti.                                      *
  *                                                             *
  * I vettori XX,MIN,PSIGN,WSIGN,ZSIGN,CRC,CRP sono ausiliari.  *

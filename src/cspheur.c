@@ -89,8 +89,9 @@ int heuristic(int improv)
     for(l=0;l<Rncells;l++)
         if( oldval[l]>ZERO )
             status[l]=1;
-	for(l=0;l<nbetter;l++)
-		status[ better[l]->index ]=1;
+    
+    for(l=0;l<nbetter;l++)
+	status[ better[l]->index ]=1;
     load_2network(status);
     free( status );
     status = NULL; /*PWOF*/
@@ -119,14 +120,14 @@ int heuristic(int improv)
 #ifdef STAMP        
         if(k%1000==0) std::cout << " " << k;
 #endif        
-        obj = protection_2level(pro->sen->var,pro->sense,pro->level,1);        
+        obj = protection_2level(pro->sen->var,pro->sense,pro->level,1);  // k==2 in problem subtable      
 
         if( obj+ZERO>=BIGVALUE ){
 #ifdef STAMP        
             std::cout << "WARNING:   not enough cells in the initial maximal set, or infeasible" << std::endl;
 #endif
             weight = INF;
-			nsup   = -1;
+	    nsup   = -1;
             goto SALIR;
         }
 #ifdef STAMP        
@@ -158,7 +159,7 @@ int heuristic(int improv)
         }
     update_heuristic(weight,nsup,sup);
     free( (void*)sup );
-    sup = NULL; /*PWOF*/
+    //sup = NULL; /*PWOF*/
 
     if( !improv ) goto SALIR;
 
@@ -235,7 +236,7 @@ int heuristic(int improv)
         }
     update_heuristic(weight,nsup,sup);
     free( (void*)sup );
-    sup = NULL; /*PWOF*/
+    //sup = NULL; /*PWOF*/
 
 SALIR:
 
@@ -481,7 +482,7 @@ static void   load_2network(char *status)
 #endif
 
 #ifdef CHECKLP
-        JJmpswrite(Nlp,"sdcnet.mps");
+        JJmpswrite(Nlp,fmpsnet);
 #endif
 ////        JJlpwrite(Nlp,"sdcnet.lp");
 }
@@ -580,7 +581,7 @@ static double    protection_2level(VARIABLE  *var,int type,double goal,int mode)
 		}			
 
         puts(" it was not possible to solve with NETOPT ");
-        JJlpwrite(Nlp,"sdcnet.lp");
+        JJlpwrite(Nlp,fsdcnetlp);
         CSPexit(EXIT_LPSOLVER); //exit(1);
     }
 
@@ -785,7 +786,9 @@ static void potential_innecesary(int    *nlist,int    *list)
     status = NULL; /*PWOF*/
 
 
-    qsort( (char *)list , *nlist , sizeof(int *) , sort_cells );
+    //qsort( (char *)list , *nlist , sizeof(int *) , sort_cells );
+    //qsort( (char *)list , *nlist , sizeof(int) , sort_cells ); // list consists of int, not int*
+    qsort( (void *)list , *nlist , sizeof(int) , sort_cells );
 }
 
 

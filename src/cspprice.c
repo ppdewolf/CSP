@@ -56,6 +56,8 @@ int pricing(int cleaning)
     double   *u;
     float    t1;
 
+    anterior = (struct PRICE*) malloc(sizeof(struct PRICE)); // PWOF added
+    
     if( list_pricing==NULL ) return(0);
 /*
     if( mac+npricing < MAX_COLS_LP ){

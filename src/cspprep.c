@@ -48,7 +48,8 @@ int preprocessing()
     clean_prot_level();
     if( nprot_level==0 ) return 0 ;
 
-    qsort( (char *)prot_level , nprot_level , sizeof(PROT_LEVEL) , sort_pl );
+    //qsort( (char *)prot_level , nprot_level , sizeof(PROT_LEVEL) , sort_pl );
+    qsort( (void *)prot_level , nprot_level , sizeof(PROT_LEVEL) , sort_pl );
 
     cvar = (double *)malloc( Rncells * sizeof(double) );
     xvar = (VARIABLE **)malloc( Rncells * sizeof(VARIABLE *) );

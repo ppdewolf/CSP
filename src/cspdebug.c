@@ -246,9 +246,9 @@ void print_lp()
 int        print_row(CONSTRAINT *con)
 
 {
-    int      card;
-    double   *coef;
-    VARIABLE **stack;
+    int      card=0;
+    double   *coef=NULL;
+    VARIABLE **stack=NULL;
 
     if(con==NULL) return(1);
 
@@ -383,9 +383,9 @@ void control_pool()
 double violated_by_heur(CONSTRAINT *con)
 
 {
-    int      card;
-    double   *coef;
-    VARIABLE **stack;
+    int      card=0;
+    double   *coef=NULL;
+    VARIABLE **stack=NULL;
     double   val;
 
 
@@ -420,9 +420,9 @@ double violated_by_heur(CONSTRAINT *con)
 int control_constraint(CONSTRAINT *con)
 
 {
-    VARIABLE **stack;
-    double   *coef,*value;
-    int      card,i;
+    VARIABLE **stack=NULL;
+    double   *coef=NULL,*value=NULL;
+    int      card=0,i;
     double   c;
 
     value = (double *)malloc( ncols*sizeof(double) );

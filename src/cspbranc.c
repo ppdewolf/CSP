@@ -292,7 +292,8 @@ static VARIABLE *variable_branching(int type)
         for(k=0;k<nsupport;k++)
             if( fabs( support[k]->val - 0.5 ) < FRAC-ZERO )
                 stack[card++] = support[k];
-        qsort( (char *)stack , card , sizeof(VARIABLE *) , sort_var );
+        //qsort( (char *)stack , card , sizeof(VARIABLE *) , sort_var );
+        qsort( (void *)stack , card , sizeof(VARIABLE *) , sort_var );
 
         if(card > NUMB) card = NUMB;
 

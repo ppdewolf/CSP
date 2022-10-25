@@ -69,16 +69,16 @@ int        separa_cover(int *card,CONSTRAINT **stack)
 static CONSTRAINT *cover_constraint(CONSTRAINT *con)
 
 {
-    int        j,k,nitem,card,new_card,ext;
+    int        j,k,nitem,card=0,new_card,ext;
     double     profit,profit0;
     double     rhs,viola,viola0,val;
-    double     *coef;
-    int        *x;
-    double     *p,*w;
-    VARIABLE   **stack,**new_stack;
-    VARIABLE   *var;
+    double     *coef = NULL;
+    int        *x = NULL;
+    double     *p = NULL,*w = NULL;
+    VARIABLE   **stack = NULL,**new_stack = NULL;
+    VARIABLE   *var = NULL;
     CONSTRAINT *inequality = NULL;
-    ITEM       *item;
+    ITEM       *item = NULL;
     int        sort_item(const void*,const void*);
 
     item       = (ITEM *)malloc( ncols*sizeof(ITEM) );
@@ -157,7 +157,8 @@ static CONSTRAINT *cover_constraint(CONSTRAINT *con)
     }
 
     if(nitem>1){
-        qsort( (char *)item , nitem , sizeof(ITEM) , sort_item );
+        //qsort( (char *)item , nitem , sizeof(ITEM) , sort_item );
+        qsort( (void *)item , nitem , sizeof(ITEM) , sort_item );
 
         x =(int *)malloc( (nitem+2)*sizeof(int) );
         if (x==NULL){            
@@ -186,7 +187,7 @@ static CONSTRAINT *cover_constraint(CONSTRAINT *con)
         }
 
         kp(nitem,p,w,rhs,x);
-
+        
         for(j=0;j<nitem;j++)
             if( x[j] ){
                 profit += item[j].coef;
@@ -194,11 +195,14 @@ static CONSTRAINT *cover_constraint(CONSTRAINT *con)
                 new_stack[ new_card++ ] = item[j].var;
             }
 
-        free((void *)p);
+        //free((void *)p);
+        free(p);
         p = NULL; /*PWOF*/
-        free((void *)w);
+        //free((void *)w);
+        free(w);
         w = NULL; /*PWOF*/
-        free((void *)x);
+        //free((void *)x);
+        free(x);
         x = NULL; /*PWOF*/
     } else if(nitem==1){
         profit += item[0].coef;
@@ -206,7 +210,8 @@ static CONSTRAINT *cover_constraint(CONSTRAINT *con)
         new_stack[ new_card++ ] = item[0].var;
     }
 
-    free((void *)item );
+    //free((void *)item );
+    free(item);
     item = NULL; /*PWOF*/
 
     if ( profit < profit0-ZERO ){
@@ -229,7 +234,8 @@ static CONSTRAINT *cover_constraint(CONSTRAINT *con)
             inequality->con    = con;
         }
     }
-    free((void *)new_stack);
+    //free((void *)new_stack);
+    free(new_stack);
     new_stack = NULL; /*PWOF*/
 
     return(inequality);
@@ -259,11 +265,11 @@ static double kp(int N,double *P,double *W,double C,int    *X)
     for(j=0;j<N;j++){
         if( W[j]>C ) W[j]=C;
         else if( W[j]<0.0 ) W[j]=0.0;
-    }
+    }  
     test = 0;
-#ifdef STAMP
-    test = 1;
-#endif        
+//#ifdef STAMP
+    //test = 1;
+//#endif        
     MT1RC(N,P-1,W-1,C,0.0001,&z,X-1,dim,test,
         INT,FLOAT,FLOAT+dim,FLOAT+(2*dim),INT+dim,FLOAT+(3*dim),FLOAT+(4*dim));
     free((void *)INT);
@@ -301,11 +307,11 @@ int sort_item(const void * i, const void *j/*ITEM *i,ITEM *j*/)
 static int  cover_extension(int * new_card ,VARIABLE    ** new_stack ,CONSTRAINT  * con ,double      * viola ,double      * viola0 )
 
 {
-    int      k,l,card,ext;
+    int      k,l,card=0,ext;
     double   maxi;
-    VARIABLE **stack;
+    VARIABLE **stack=NULL; // Initialized to NULL-pointer
     VARIABLE *var;
-    double   *coef,*new_coef;
+    double   *coef=NULL,*new_coef=NULL; // Initialized to NULL-pointer
     
     new_coef  = (double *)malloc( (*new_card)*sizeof(double) );
 
