@@ -22,7 +22,6 @@ jobs:
     continue-on-error: FALSE
     steps:
       uses: actions/checkout@v3
-      name: make SCIP
       run: make SCIP
     with:
       platform: x64
